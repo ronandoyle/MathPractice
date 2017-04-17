@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Math Practice</string>
+    <string name="action_settings">Settings</string>
+    <string name="addition">Addition</string>
+    <string name="subtraction">Subtraction</string>
+    <string name="multiplication">Multiplication</string>
+    <string name="division">Division</string>
+</resources>

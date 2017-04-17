@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="nanorstudios.ie.mathpractice.MainActivity"
+    tools:showIn="@layout/activity_main"
+    android:background="@color/colorBackground"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    android:paddingTop="40dp">
+
+        <Button
+            android:id="@+id/addition"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            style="@style/MainButtonStyle"
+            android:text="@string/addition"/>
+
+        <Button
+            android:id="@+id/subtraction"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            style="@style/MainButtonStyle"
+            android:layout_below="@id/addition"
+            android:text="@string/subtraction"/>
+
+        <Button
+            android:id="@+id/multiplication"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            style="@style/MainButtonStyle"
+            android:layout_below="@id/subtraction"
+            android:text="@string/multiplication"/>
+
+        <Button
+            android:id="@+id/division"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            style="@style/MainButtonStyle"
+            android:layout_below="@id/multiplication"
+            android:layout_marginBottom="0dp"
+            android:text="@string/division"/>
+
+</RelativeLayout>
