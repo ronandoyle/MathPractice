@@ -3,6 +3,7 @@ package nanorstudios.ie.mathpractice;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -15,6 +16,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
+    private NumberListFragment numberListFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,39 +29,59 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (numberListFragment != null) {
+            removeFragment();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @OnClick(R.id.addition)
     public void onClickAddition() {
+        initNumberListFragment(OperatorEnum.ADDITION);
     }
 
     @OnClick(R.id.subtraction)
     public void onClickSubtraction() {
+        initNumberListFragment(OperatorEnum.SUBTRACTION);
     }
 
     @OnClick(R.id.multiplication)
     public void onClickMultiplication() {
+        initNumberListFragment(OperatorEnum.MULTIPLICATION);
     }
 
     @OnClick(R.id.division)
     public void onClickDivision() {
+        initNumberListFragment(OperatorEnum.DIVISION);
+    }
+
+    private void initNumberListFragment(OperatorEnum operatorEnum) {
+        numberListFragment = NumberListFragment.newInstance(operatorEnum);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.frame_container, numberListFragment, NumberListFragment.TAG);
+        ft.commit();
+    }
+
+    private void removeFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.remove(numberListFragment);
+        ft.commit();
+        numberListFragment = null;
     }
 }
