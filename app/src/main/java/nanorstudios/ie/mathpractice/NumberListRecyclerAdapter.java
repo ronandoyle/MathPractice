@@ -22,10 +22,12 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
     private static OperatorEnum sOperatorEnum;
     private String[] mNumberList;
     private WeakReference<Context> mWeakRefContext;
+    private NumberListItemClickListener listener;
 
-    public NumberListRecyclerAdapter(Context context, OperatorEnum operatorEnum) {
+    public NumberListRecyclerAdapter(Context context, OperatorEnum operatorEnum, NumberListItemClickListener listener) {
         mWeakRefContext = new WeakReference<>(context);
         sOperatorEnum = operatorEnum;
+        this.listener = listener;
         mNumberList = mWeakRefContext.get().getResources().getStringArray(R.array.number_list_array);
     }
 
@@ -57,7 +59,7 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
         holder.tvTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "You just clicked " + position, Toast.LENGTH_SHORT).show();
+                listener.onListItemClicked(position);
             }
         });
     }

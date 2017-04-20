@@ -22,6 +22,7 @@
         <item name="android:height">58dp</item>
         <item name="android:background">@color/colorMainButton</item>
         <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:layout_marginBottom">30dp</item>
     </style>
 
