@@ -6,5 +6,5 @@ package nanorstudios.ie.mathpractice;
 
 public class Constants {
     public static final String CHOSEN_NUMBER = "ChosenNum";
-    public static final String OPERATOR_KEY = "OperaterKey";
+    public static final String CHOSEN_OPERATOR = "OperatorKey";
 }

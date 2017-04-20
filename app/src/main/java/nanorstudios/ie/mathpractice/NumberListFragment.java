@@ -29,7 +29,7 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public static NumberListFragment newInstance(OperatorEnum operator) {
         NumberListFragment numberListFragment = new NumberListFragment();
         Bundle arguments = new Bundle();
-        arguments.putSerializable(Constants.OPERATOR_KEY, operator);
+        arguments.putSerializable(Constants.CHOSEN_OPERATOR, operator);
         numberListFragment.setArguments(arguments);
         return numberListFragment;
     }
@@ -55,8 +55,8 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     }
 
     private void extractArguments() {
-        if (getArguments() != null && getArguments().containsKey(Constants.OPERATOR_KEY)) {
-            mOperatorEnum = (OperatorEnum) getArguments().getSerializable(Constants.OPERATOR_KEY);
+        if (getArguments() != null && getArguments().containsKey(Constants.CHOSEN_OPERATOR)) {
+            mOperatorEnum = (OperatorEnum) getArguments().getSerializable(Constants.CHOSEN_OPERATOR);
         }
     }
 
@@ -71,6 +71,7 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public void onListItemClicked(int pos) {
         Intent intent = new Intent(getActivity(), QuizActivity.class);
         intent.putExtra(Constants.CHOSEN_NUMBER, pos);
+        intent.putExtra(Constants.CHOSEN_OPERATOR, mOperatorEnum);
         startActivity(intent);
     }
 }
