@@ -74,6 +74,10 @@ public class QuizActivity extends AppCompatActivity {
 
         int randomNumber = getRandomNumberFromArray();
 
+        if (endOfQuizReached(randomNumber)) {
+            endQuiz();
+        }
+
         switch (mOperator) {
             case ADDITION:
                 operatorSymbol = getString(R.string.addition_symbol);
@@ -96,6 +100,10 @@ public class QuizActivity extends AppCompatActivity {
                 mCorrectAnswer = randomNumber + mChosenNumber;
         }
         tvQuestion.setText(String.valueOf(randomNumber) + " " + operatorSymbol + String.valueOf(mChosenNumber) + " = ?" );
+    }
+
+    private boolean endOfQuizReached(int randomNumber) {
+        return randomNumber == -1;
     }
 
     private void setupButtonList() {
@@ -153,8 +161,13 @@ public class QuizActivity extends AppCompatActivity {
     private void handleBtnClick(Button button) {
         if (button == mCorrectAnswerButton) {
             Toast.makeText(this, "Well Done!", Toast.LENGTH_SHORT).show();
+            setupUI();
         } else {
             Toast.makeText(this, "Oops, try again!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void endQuiz() {
+
     }
 }
