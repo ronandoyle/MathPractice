@@ -35,6 +35,14 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.RequestCodes.QUIZ && resultCode == Constants.ResultCodes.QUIZ_FINISHED) {
+            highlightItem(data.getIntExtra(Constants.CHOSEN_NUMBER, -1));
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         extractArguments();
@@ -44,6 +52,7 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
+
 
     @Nullable
     @Override
@@ -72,6 +81,10 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
         Intent intent = new Intent(getActivity(), QuizActivity.class);
         intent.putExtra(Constants.CHOSEN_NUMBER, pos);
         intent.putExtra(Constants.CHOSEN_OPERATOR, mOperatorEnum);
-        startActivity(intent);
+        startActivityForResult(intent, Constants.RequestCodes.QUIZ);
+    }
+
+    public void highlightItem(int chosenNumber) {
+        recyclerAdapter.highlightItem(chosenNumber);
     }
 }

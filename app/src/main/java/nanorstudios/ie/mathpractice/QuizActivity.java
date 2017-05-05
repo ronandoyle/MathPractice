@@ -1,5 +1,6 @@
 package nanorstudios.ie.mathpractice;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
@@ -18,7 +19,7 @@ import butterknife.OnClick;
  * This activity is used to quiz the user.
  */
 
-public class QuizActivity extends AppCompatActivity {
+public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.EndOfQuizCallbacks {
 
     @BindView(R.id.tv_question) TextView tvQuestion;
     @BindView(R.id.btn_opt1) Button btnOptOne;
@@ -158,6 +159,21 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void endQuiz() {
+        EndOfQuizDialog dialog = EndOfQuizDialog.newInstance(mChosenNumber);
+        dialog.show(getSupportFragmentManager(), EndOfQuizDialog.TAG);
+    }
 
+    @Override
+    public void onBackPressed() {
+        getParent().setResult(Constants.ResultCodes.QUIZ_QUIT);
+        super.onBackPressed();
+    }
+
+    @Override
+    public void closeActivity() {
+        Intent data = new Intent();
+        data.putExtra(Constants.CHOSEN_NUMBER, mChosenNumber);
+        setResult(Constants.ResultCodes.QUIZ_FINISHED, data);
+        finish();
     }
 }
