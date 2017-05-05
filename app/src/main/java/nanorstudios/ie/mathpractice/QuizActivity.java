@@ -143,19 +143,9 @@ public class QuizActivity extends AppCompatActivity {
         return randomNumber;
     }
 
-    @OnClick(R.id.btn_opt1)
-    public void onClickOptOne() {
-        handleBtnClick(btnOptOne);
-    }
-
-    @OnClick(R.id.btn_opt2)
-    public void onClickOptTwo() {
-        handleBtnClick(btnOptTwo);
-    }
-
-    @OnClick(R.id.btn_opt3)
-    public void onClickOptThree() {
-        handleBtnClick(btnOptThree);
+    @OnClick({R.id.btn_opt1, R.id.btn_opt2, R.id.btn_opt3})
+    public void onClickOptOne(Button clickedBtn) {
+        handleBtnClick(clickedBtn);
     }
 
     private void handleBtnClick(Button button) {
