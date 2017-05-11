@@ -38,6 +38,12 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.RequestCodes.QUIZ && resultCode == Constants.ResultCodes.QUIZ_FINISHED) {
+            extractExtraFromResult(data);
+        }
+    }
+
+    private void extractExtraFromResult(Intent data) {
+        if (data != null && data.hasExtra(Constants.CHOSEN_NUMBER)) {
             highlightItem(data.getIntExtra(Constants.CHOSEN_NUMBER, -1));
         }
     }
