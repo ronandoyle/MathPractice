@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#FFC107</color>
+    <color name="colorPrimaryDark">#FF9800</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorBackground">#FFFDE7</color>
-    <color name="colorMainButton">#2196f2</color>
+    <color name="colorMainButton">#07C1FF</color>
     <color name="colorSelectedListItem">#eaeaea</color>
     <color name="colorCompletedItemUnselected">#81C784</color>
     <color name="colorCompletedItemSelected">#4CAF50</color>

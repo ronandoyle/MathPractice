@@ -10,7 +10,8 @@
     tools:showIn="@layout/activity_main"
     android:paddingStart="30dp"
     android:paddingEnd="30dp"
-    android:paddingTop="40dp">
+    android:paddingTop="40dp"
+    android:layout_gravity="center">
 
         <Button
             android:id="@+id/addition"
