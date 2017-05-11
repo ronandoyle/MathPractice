@@ -166,10 +166,10 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
 
     private void handleBtnClick(Button button) {
         if (button == mCorrectAnswerButton) {
-//            Toast.makeText(this, "Well Done!", Toast.LENGTH_SHORT).show();
+//            showSuccessAnimation();
             setupUI();
         } else {
-//            Toast.makeText(this, "Oops, try again!", Toast.LENGTH_SHORT).show();
+//            showFailureAnimation();
         }
     }
 
@@ -187,6 +187,8 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
         }
         super.onBackPressed();
     }
+
+
 
     @Override
     public void closeActivity() {
