@@ -22,6 +22,10 @@
         <activity android:name=".QuizActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="b7e69f91d6c0d163f0615717e90bdc789b6c44f4" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
