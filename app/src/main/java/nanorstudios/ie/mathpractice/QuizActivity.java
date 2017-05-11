@@ -165,7 +165,11 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
 
     @Override
     public void onBackPressed() {
-        getParent().setResult(Constants.ResultCodes.QUIZ_QUIT);
+        if (getParent() != null) {
+            getParent().setResult(Constants.ResultCodes.QUIZ_QUIT);
+        } else {
+            setResult(Constants.ResultCodes.QUIZ_QUIT);
+        }
         super.onBackPressed();
     }
 
