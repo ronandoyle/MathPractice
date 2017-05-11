@@ -6,5 +6,6 @@
     <color name="colorBackground">#FFFDE7</color>
     <color name="colorMainButton">#2196f2</color>
     <color name="colorSelectedListItem">#eaeaea</color>
-    <color name="colorCompletedItem">#81c784</color>
+    <color name="colorCompletedItemUnselected">#81C784</color>
+    <color name="colorCompletedItemSelected">#4CAF50</color>
 </resources>

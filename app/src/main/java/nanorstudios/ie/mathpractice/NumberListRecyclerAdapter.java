@@ -1,7 +1,6 @@
 package nanorstudios.ie.mathpractice;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,7 +67,7 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
         });
 
         if (completedQuizNumbers.contains(position)) {
-            holder.container.setBackgroundColor(ContextCompat.getColor(mWeakRefContext.get(), R.color.colorCompletedItem));
+            holder.tvTitle.setBackgroundResource(R.drawable.completed_selectable_list_item_bg);
         }
     }
 

@@ -151,10 +151,10 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
 
     private void handleBtnClick(Button button) {
         if (button == mCorrectAnswerButton) {
-            Toast.makeText(this, "Well Done!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Well Done!", Toast.LENGTH_SHORT).show();
             setupUI();
         } else {
-            Toast.makeText(this, "Oops, try again!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Oops, try again!", Toast.LENGTH_SHORT).show();
         }
     }
 

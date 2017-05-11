@@ -65,8 +65,18 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_number_list, container, false);
         ButterKnife.bind(this, view);
-        setupRecyclerView();
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupRecyclerView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     private void extractArguments() {
