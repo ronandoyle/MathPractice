@@ -74,11 +74,6 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
         setupRecyclerView();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
     private void extractArguments() {
         if (getArguments() != null && getArguments().containsKey(Constants.CHOSEN_OPERATOR)) {
             mOperatorEnum = (OperatorEnum) getArguments().getSerializable(Constants.CHOSEN_OPERATOR);

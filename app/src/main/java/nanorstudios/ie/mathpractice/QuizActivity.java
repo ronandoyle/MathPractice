@@ -66,8 +66,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
 
     private void setupUI() {
         setupQuestionTextView();
-        setupButtonList();
-        setupButtonText();
+        setupButtons();
     }
 
     private void setupQuestionTextView() {
@@ -107,6 +106,11 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
         return randomNumber == -1;
     }
 
+    private void setupButtons() {
+        setupButtonList();
+        setupButtonText();
+    }
+
     private void setupButtonList() {
         buttonList = new ArrayList<>(3);
         buttonList.add(btnOptOne);
@@ -116,18 +120,29 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
 
     private void setupButtonText() {
         int correctAnswerButton = new Random().nextInt(buttonList.size());
+
         mCorrectAnswerButton = buttonList.get(correctAnswerButton);
         mCorrectAnswerButton.setText(String.valueOf(mCorrectAnswer));
 
+        List<Integer> randomWrongAnswerList = new ArrayList<>();
         for (Button button : buttonList) {
             if (button != buttonList.get(correctAnswerButton)) {
                 int randomWrongAnswer = -1;
-                while (randomWrongAnswer == -1) {
-                    randomWrongAnswer = new Random().nextInt(quizNumbers.length);
-                }
+                randomWrongAnswer = getRandomWrongAnswer(randomWrongAnswerList, randomWrongAnswer);
+                randomWrongAnswerList.add(randomWrongAnswer);
                 button.setText(String.valueOf(randomWrongAnswer));
             }
         }
+    }
+
+    private int getRandomWrongAnswer(List<Integer> randomWrongAnswerList, int randomWrongAnswer) {
+        while (randomWrongAnswer == -1) {
+            randomWrongAnswer = new Random().nextInt(quizNumbers.length);
+            if (randomWrongAnswerList.contains(randomWrongAnswer) || randomWrongAnswer == mCorrectAnswer) {
+                randomWrongAnswer = -1;
+            }
+        }
+        return randomWrongAnswer;
     }
 
     private int getRandomNumberFromArray() {
