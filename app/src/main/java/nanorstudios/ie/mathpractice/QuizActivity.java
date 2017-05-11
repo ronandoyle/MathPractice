@@ -4,7 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +31,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
     @BindView(R.id.btn_opt1) Button btnOptOne;
     @BindView(R.id.btn_opt2) Button btnOptTwo;
     @BindView(R.id.btn_opt3) Button btnOptThree;
+    @BindView(R.id.iv_feedback) ImageView ivFeedback;
 
     private int mChosenNumber;
     private OperatorEnum mOperator;
@@ -173,11 +179,56 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
 
     private void handleBtnClick(Button button) {
         if (button == mCorrectAnswerButton) {
-//            showSuccessAnimation();
+            showSuccessAnimation();
             setupUI();
         } else {
-//            showFailureAnimation();
+            showFailureAnimation();
         }
+    }
+
+    private void showSuccessAnimation() {
+        ivFeedback.setBackground(getDrawable(R.drawable.ic_tick));
+        Animation anim = new AlphaAnimation(0, 1);
+        anim.setDuration(700);
+        ivFeedback.setAnimation(anim);
+        anim.start();
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ivFeedback.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+    }
+
+    private void showFailureAnimation() {
+        ivFeedback.setBackground(getDrawable(R.drawable.ic_x));
+        Animation anim = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ivFeedback.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
     }
 
     private void endQuiz() {
@@ -194,8 +245,6 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
         }
         super.onBackPressed();
     }
-
-
 
     @Override
     public void closeActivity() {
