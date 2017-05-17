@@ -4,10 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -187,48 +183,9 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
     }
 
     private void showSuccessAnimation() {
-        ivFeedback.setBackground(getDrawable(R.drawable.ic_tick));
-        Animation anim = new AlphaAnimation(0, 1);
-        anim.setDuration(700);
-        ivFeedback.setAnimation(anim);
-        anim.start();
-        anim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                ivFeedback.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
     }
 
     private void showFailureAnimation() {
-        ivFeedback.setBackground(getDrawable(R.drawable.ic_x));
-        Animation anim = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-        anim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                ivFeedback.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
     }
 
     private void endQuiz() {
