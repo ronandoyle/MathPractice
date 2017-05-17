@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "406001333867",
+    "firebase_url": "https://mathpractice-b72d2.firebaseio.com",
+    "project_id": "mathpractice-b72d2",
+    "storage_bucket": "mathpractice-b72d2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:406001333867:android:fa14cf124bff90cf",
+        "android_client_info": {
+          "package_name": "nanorstudios.ie.mathpractice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "406001333867-prv3qk458i02joajr3eepjqlk4u73lht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "nanorstudios.ie.mathpractice",
+            "certificate_hash": "55b1936fb954e240df3d62894836266fc8973e36"
+          }
+        },
+        {
+          "client_id": "406001333867-1o5mbjnj6numona2buacqtsukgcpqge5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfNgH1odJMbpdOssOfH-mbYjdLTiOddZk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "406001333867-1o5mbjnj6numona2buacqtsukgcpqge5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
