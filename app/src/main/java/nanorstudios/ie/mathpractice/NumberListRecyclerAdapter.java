@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
@@ -25,6 +27,7 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
     private WeakReference<Context> mWeakRefContext;
     private NumberListItemClickListener listener;
     private List<Integer> completedQuizNumbers;
+    private int lastPos = -1;
 
     public NumberListRecyclerAdapter(Context context, OperatorEnum operatorEnum, NumberListItemClickListener listener) {
         mWeakRefContext = new WeakReference<>(context);
@@ -71,6 +74,7 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
         } else {
             holder.tvTitle.setBackgroundResource(R.drawable.selectable_list_item_bg);
         }
+        setAnimation(holder.container, position);
     }
 
     @Override
@@ -81,6 +85,14 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
     public void highlightItem(int chosenNumber) {
         completedQuizNumbers.add(chosenNumber);
         notifyDataSetChanged();
+    }
+
+    private void setAnimation(View view, int pos) {
+        if (pos > lastPos) {
+            Animation animation = AnimationUtils.loadAnimation(mWeakRefContext.get(), android.R.anim.fade_in);
+            view.startAnimation(animation);
+            lastPos = pos;
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,13 +23,15 @@ import butterknife.OnClick;
  * This activity is used to quiz the user.
  */
 
-public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.EndOfQuizCallbacks {
+public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment.EndOfQuizCallbacks {
 
     @BindView(R.id.tv_question) TextView tvQuestion;
     @BindView(R.id.btn_opt1) Button btnOptOne;
     @BindView(R.id.btn_opt2) Button btnOptTwo;
     @BindView(R.id.btn_opt3) Button btnOptThree;
+    @BindView(R.id.btn_cheat) Button btnCheat;
     @BindView(R.id.iv_feedback) ImageView ivFeedback;
+    @BindView(R.id.button_container) LinearLayout buttonContainer;
 
     private int mChosenNumber;
     private OperatorEnum mOperator;
@@ -108,7 +112,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
                 operatorSymbol = getString(R.string.addition_symbol);
                 mCorrectAnswer = randomNumber + mChosenNumber;
         }
-        tvQuestion.setText(String.valueOf(randomNumber) + " " + operatorSymbol + String.valueOf(mChosenNumber) + " = ?" );
+        tvQuestion.setText(String.valueOf(randomNumber) + " " + operatorSymbol + " " + String.valueOf(mChosenNumber) + " = ?" );
     }
 
     private boolean endOfQuizReached(int randomNumber) {
@@ -189,8 +193,13 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
     }
 
     private void endQuiz() {
-        EndOfQuizDialog dialog = EndOfQuizDialog.newInstance(mChosenNumber);
-        dialog.show(getSupportFragmentManager(), EndOfQuizDialog.TAG);
+        btnCheat.setVisibility(View.GONE);
+        EndOfQuizFragment fragment = EndOfQuizFragment.newInstance(mChosenNumber);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .addSharedElement(buttonContainer, buttonContainer.getTransitionName())
+                .add(R.id.frame_container, fragment, NumberListFragment.TAG)
+                .commit();
     }
 
     @Override
@@ -209,5 +218,10 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizDialog.E
         data.putExtra(Constants.CHOSEN_NUMBER, mChosenNumber);
         setResult(Constants.ResultCodes.QUIZ_FINISHED, data);
         finish();
+    }
+
+    @OnClick(R.id.btn_cheat)
+    public void onClickCheat() {
+        endQuiz();
     }
 }
