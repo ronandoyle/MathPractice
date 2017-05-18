@@ -68,6 +68,8 @@ public class NumberListRecyclerAdapter extends RecyclerView.Adapter<NumberListRe
 
         if (completedQuizNumbers.contains(position)) {
             holder.tvTitle.setBackgroundResource(R.drawable.completed_selectable_list_item_bg);
+        } else {
+            holder.tvTitle.setBackgroundResource(R.drawable.selectable_list_item_bg);
         }
     }
 
