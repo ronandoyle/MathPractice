@@ -10,6 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -25,6 +36,8 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
 
     private NumberListRecyclerAdapter recyclerAdapter;
     private OperatorEnum mOperatorEnum;
+
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     public static NumberListFragment newInstance(OperatorEnum operator) {
         NumberListFragment numberListFragment = new NumberListFragment();
@@ -52,6 +65,25 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         extractArguments();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        DatabaseReference completedReg = mRootRef.child("completed");
+        completedReg.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap<String, ArrayList<String>> completed = ((HashMap<String, ArrayList<String>>) dataSnapshot.getValue());
+                highlightItemsFromDatabase(completed);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -97,5 +129,20 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
 
     public void highlightItem(int chosenNumber) {
         recyclerAdapter.highlightItem(chosenNumber);
+    }
+
+    public void highlightItemsFromDatabase(HashMap<String, ArrayList<String>> dbItems) {
+        Iterator iterator = dbItems.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, ArrayList<String>> pair = (Map.Entry<String, ArrayList<String>>) iterator.next();
+            switch (mOperatorEnum) {
+                case ADDITION:
+                    if (pair.getKey().equals("addition")) {
+                        for (String value : pair.getValue()) {
+                            highlightItem(Integer.valueOf(value.substring(1)));
+                        }
+                    }
+            }
+        }
     }
 }
