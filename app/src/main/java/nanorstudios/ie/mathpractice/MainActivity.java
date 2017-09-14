@@ -17,14 +17,27 @@ public class MainActivity extends AppCompatActivity {
 
     private NumberListFragment mNumberListFragment;
     private OperatorEnum mChosenOperator;
+    // TODO: 14/09/2017 Removing this for v1
+//    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+
+    // TODO: 14/09/2017 Removing this for v1
+//    private CompletedQuizzesComponent sCompletedQuizzesComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
+        // TODO: 14/09/2017 Removing this for v1
+//        sCompletedQuizzesComponent = ((MathPracticeApplication) getApplication()).getCompletedQuizzesComponent();
         ButterKnife.bind(this);
         setupToolbar();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        setupDatabase();
     }
 
     @Override
@@ -93,4 +106,26 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
         mNumberListFragment = null;
     }
+
+    // TODO: 14/09/2017 Removing this for v1
+//    protected CompletedQuizzesComponent getCompletedQuizzesComponent() {
+//        return sCompletedQuizzesComponent;
+//    }
+
+    // TODO: 14/09/2017 Removing this for v1
+//    private void setupDatabase() {
+//        DatabaseReference completedRef = mRootRef.child("completed");
+//        completedRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+                // TODO: 14/09/2017 Removing this for v1
+//                sCompletedQuizzesComponent.provideCompletedQuizzes().setQuizzes(((HashMap<String, ArrayList<String>>) dataSnapshot.getValue()));
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 }

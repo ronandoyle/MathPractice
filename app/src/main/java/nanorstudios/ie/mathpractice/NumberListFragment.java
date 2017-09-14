@@ -1,20 +1,19 @@
 package nanorstudios.ie.mathpractice;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +35,8 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
 
     private NumberListRecyclerAdapter recyclerAdapter;
     private OperatorEnum mOperatorEnum;
-
-    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    // TODO: 14/09/2017 Removing for v1
+//    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     public static NumberListFragment newInstance(OperatorEnum operator) {
         NumberListFragment numberListFragment = new NumberListFragment();
@@ -48,43 +47,30 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.RequestCodes.QUIZ && resultCode == Constants.ResultCodes.QUIZ_FINISHED) {
-            extractExtraFromResult(data);
-        }
-    }
-
-    private void extractExtraFromResult(Intent data) {
-        if (data != null && data.hasExtra(Constants.CHOSEN_NUMBER)) {
-            highlightItem(data.getIntExtra(Constants.CHOSEN_NUMBER, -1));
-        }
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         extractArguments();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        DatabaseReference completedReg = mRootRef.child("completed");
-        completedReg.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, ArrayList<String>> completed = ((HashMap<String, ArrayList<String>>) dataSnapshot.getValue());
-                highlightItemsFromDatabase(completed);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
+    // TODO: 14/09/2017 Removing for v1
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        DatabaseReference completedRef = mRootRef.child("completed");
+//        completedRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                HashMap<String, ArrayList<String>> completed = ((HashMap<String, ArrayList<String>>) dataSnapshot.getValue());
+//                highlightItemsFromDatabase(completed);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -97,6 +83,7 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_number_list, container, false);
         ButterKnife.bind(this, view);
+        setupRecyclerView();
         return view;
     }
 
@@ -104,6 +91,12 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupRecyclerView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        highlightItemsFromSharedPreferences();
     }
 
     private void extractArguments() {
@@ -131,18 +124,55 @@ public class NumberListFragment extends Fragment implements NumberListItemClickL
         recyclerAdapter.highlightItem(chosenNumber);
     }
 
+    private void highlightItemsFromSharedPreferences() {
+        SharedPreferences preferences = getActivity().getSharedPreferences(Constants.Preferences.NAME, 0);
+
+        String storedString = preferences.getString(Constants.Preferences.COMPLETED_QUIZZES, "");
+        if (TextUtils.isEmpty(storedString)) {
+            return;
+        }
+
+        CompletedQuizzes completedQuizzes = new CompletedQuizzes();
+        completedQuizzes.setQuizzes(
+                (HashMap<String, ArrayList<String>>) new Gson().fromJson(storedString, new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType()));
+        highlightItemsFromDatabase(completedQuizzes.getQuizzes());
+    }
+
     public void highlightItemsFromDatabase(HashMap<String, ArrayList<String>> dbItems) {
         Iterator iterator = dbItems.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, ArrayList<String>> pair = (Map.Entry<String, ArrayList<String>>) iterator.next();
             switch (mOperatorEnum) {
                 case ADDITION:
-                    if (pair.getKey().equals("addition")) {
-                        for (String value : pair.getValue()) {
-                            highlightItem(Integer.valueOf(value.substring(1)));
-                        }
+                    if (pair.getKey().equalsIgnoreCase(getString(R.string.addition))) {
+                        extractValue(pair);
                     }
+                    break;
+                case SUBTRACTION:
+                    if (pair.getKey().equalsIgnoreCase(getString(R.string.subtraction))) {
+                        extractValue(pair);
+                    }
+                    break;
+                case MULTIPLICATION:
+                    if (pair.getKey().equalsIgnoreCase(getString(R.string.multiplication))) {
+                        extractValue(pair);
+                    }
+                    break;
+                case DIVISION:
+                    if (pair.getKey().equalsIgnoreCase(getString(R.string.division))) {
+                        extractValue(pair);
+                    }
+                    break;
             }
+        }
+    }
+
+    private void extractValue(Map.Entry<String, ArrayList<String>> pair) {
+        for (String value : pair.getValue()) {
+            if (TextUtils.isEmpty(value.substring(0))) {
+                continue;
+            }
+            highlightItem(Integer.valueOf(value.substring(0)));
         }
     }
 }

@@ -59,11 +59,6 @@ public class EndOfQuizFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         mUnbinder.unbind();

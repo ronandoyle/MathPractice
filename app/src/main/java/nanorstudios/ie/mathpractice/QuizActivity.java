@@ -1,9 +1,11 @@
 package nanorstudios.ie.mathpractice;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -11,7 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -37,10 +45,14 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     private OperatorEnum mOperator;
     private int mCorrectAnswer;
 
-    private int[] quizNumbers = {0,1,2,3,4,5,6,7,8,9,10};
+    private int[] standardQuizNumbers = {0,1,2,3,4,5,6,7,8,9,10,11,12};
+
     private List<Integer> usedNumbers = new ArrayList<>(0);
     private List<Button> buttonList;
     private Button mCorrectAnswerButton;
+
+    // TODO: 14/09/2017 Removing for v1
+//    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,22 +95,45 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     }
 
     private void setupQuestionTextView() {
-        String operatorSymbol;
+        String operatorSymbol = "";
 
-        int randomNumber = getRandomNumberFromArray();
+//        int randomNumber = getRandomNumberFromArray();
+//
+//        if (endOfQuizReached(randomNumber)) {
+//            endQuiz();
+//            return;
+//        }
 
-        if (endOfQuizReached(randomNumber)) {
-            endQuiz();
-        }
+        int randomNumber = -1;
+
 
         switch (mOperator) {
             case ADDITION:
+
+                randomNumber = getRandomNumberFromArray();
+
+                if (endOfQuizReached(randomNumber)) {
+                    endQuiz();
+                    return;
+                }
+
                 operatorSymbol = getString(R.string.addition_symbol);
                 mCorrectAnswer = randomNumber + mChosenNumber;
                 break;
             case SUBTRACTION:
+
+                randomNumber = getRandomSubtractionNumberFromArray(mChosenNumber);
+
                 operatorSymbol = getString(R.string.subtraction_symbol);
-                mCorrectAnswer = Math.abs(randomNumber - mChosenNumber);
+
+                if (randomNumber > mChosenNumber) {
+                    mCorrectAnswer = randomNumber - mChosenNumber;
+                } else if (randomNumber < mCorrectAnswer) {
+                    mCorrectAnswer = mChosenNumber - randomNumber;
+                } else {
+                    mCorrectAnswer = randomNumber;
+                }
+
                 break;
             case MULTIPLICATION:
                 operatorSymbol = getString(R.string.multiplication_symbol);
@@ -108,11 +143,13 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
                 operatorSymbol = getString(R.string.division_symbol);
                 mCorrectAnswer = randomNumber/mChosenNumber;
                 break;
-            default:
-                operatorSymbol = getString(R.string.addition_symbol);
-                mCorrectAnswer = randomNumber + mChosenNumber;
         }
-        tvQuestion.setText(String.valueOf(randomNumber) + " " + operatorSymbol + " " + String.valueOf(mChosenNumber) + " = ?" );
+
+        if (randomNumber > mChosenNumber) {
+            tvQuestion.setText(String.valueOf(randomNumber) + " " + operatorSymbol + " " + String.valueOf(mChosenNumber) + " = ?" );
+        } else if (randomNumber < mCorrectAnswer) {
+            tvQuestion.setText(String.valueOf(mChosenNumber) + " " + operatorSymbol + " " + String.valueOf(randomNumber) + " = ?" );
+        }
     }
 
     private boolean endOfQuizReached(int randomNumber) {
@@ -150,7 +187,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
 
     private int getRandomWrongAnswer(List<Integer> randomWrongAnswerList, int randomWrongAnswer) {
         while (randomWrongAnswer == -1) {
-            randomWrongAnswer = new Random().nextInt(quizNumbers.length);
+            randomWrongAnswer = new Random().nextInt(standardQuizNumbers.length);
             if (randomWrongAnswerList.contains(randomWrongAnswer) || randomWrongAnswer == mCorrectAnswer) {
                 randomWrongAnswer = -1;
             }
@@ -159,13 +196,28 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     }
 
     private int getRandomNumberFromArray() {
-        if (usedNumbers.size() == quizNumbers.length) {
+        if (usedNumbers.size() == standardQuizNumbers.length) {
             return -1;
         }
 
-        int randomNumber = new Random().nextInt(quizNumbers.length);
+        int randomNumber = new Random().nextInt(standardQuizNumbers.length);
         if (usedNumbers.contains(randomNumber)) {
             return getRandomNumberFromArray();
+        }
+
+        usedNumbers.add(randomNumber);
+        return randomNumber;
+    }
+
+    private int getRandomSubtractionNumberFromArray(int chosenNumber) {
+        int[] subtractionQuizNumbers = new int[13];
+        for (int i = 0; i < standardQuizNumbers.length; i++) {
+            subtractionQuizNumbers[i] = standardQuizNumbers[i] + chosenNumber;
+        }
+
+        int randomNumber = new Random().nextInt(subtractionQuizNumbers[subtractionQuizNumbers.length - 1] - chosenNumber) + chosenNumber;
+        if (usedNumbers.contains(randomNumber)) {
+            return getRandomSubtractionNumberFromArray(chosenNumber);
         }
 
         usedNumbers.add(randomNumber);
@@ -194,12 +246,63 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
 
     private void endQuiz() {
         btnCheat.setVisibility(View.GONE);
+        updateDatabase();
         EndOfQuizFragment fragment = EndOfQuizFragment.newInstance(mChosenNumber);
         getSupportFragmentManager()
                 .beginTransaction()
                 .addSharedElement(buttonContainer, buttonContainer.getTransitionName())
                 .add(R.id.frame_container, fragment, NumberListFragment.TAG)
                 .commit();
+    }
+
+    private void updateDatabase() {
+//        if (mRootRef == null) {
+//            return;
+//        }
+        // TODO: 14/09/2017 Removing firebase from v1
+//        DatabaseReference reference = mRootRef.child("completed");
+
+//        CompletedQuizzesComponent quizzesComponent = ((MathPracticeApplication) getApplication()).getCompletedQuizzesComponent();
+
+
+        SharedPreferences preferences = getSharedPreferences(Constants.Preferences.NAME, 0);
+
+        String storedString = preferences.getString(Constants.Preferences.COMPLETED_QUIZZES, "");
+        CompletedQuizzes completedQuizzes = new CompletedQuizzes();
+
+        if (!TextUtils.isEmpty(storedString)) {
+            completedQuizzes.setQuizzes((HashMap<String, ArrayList<String>>) new Gson().
+                            fromJson(storedString, new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType()));
+        }
+
+        switch (mOperator) {
+            case ADDITION:
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.ADDITION).add(String.valueOf(mChosenNumber));
+                break;
+            case SUBTRACTION:
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.SUBTRACTION).add(String.valueOf(mChosenNumber));
+                break;
+            case MULTIPLICATION:
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.MULTIPLICATION).add(String.valueOf(mChosenNumber));
+                break;
+            case DIVISION:
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.DIVISION).add(String.valueOf(mChosenNumber));
+                break;
+        }
+//        reference.setValue(quizzesComponent.provideCompletedQuizzes().getQuizzes());
+        writeCompletedQuizzesToSharedPreferences(preferences.edit(), completedQuizzes);
+    }
+
+    private void writeCompletedQuizzesToSharedPreferences(SharedPreferences.Editor prefEditor, CompletedQuizzes completedQuizzes) {
+
+        GsonBuilder builder = new GsonBuilder();
+
+        Gson gson = builder.enableComplexMapKeySerialization().setPrettyPrinting().create();
+        Type type = new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType();
+        String json = gson.toJson(completedQuizzes.getQuizzes(), type);
+
+        prefEditor.putString(Constants.Preferences.COMPLETED_QUIZZES, json);
+        prefEditor.apply();
     }
 
     @Override
