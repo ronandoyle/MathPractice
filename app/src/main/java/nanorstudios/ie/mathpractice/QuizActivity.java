@@ -150,6 +150,14 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
 
                 break;
             case MULTIPLICATION:
+
+                randomNumber = getRandomNumberFromArray();
+
+                if (endOfQuizReached(randomNumber)) {
+                    endQuiz();
+                    return;
+                }
+
                 operatorSymbol = getString(R.string.multiplication_symbol);
                 mCorrectAnswer = randomNumber * mChosenNumber;
                 break;
