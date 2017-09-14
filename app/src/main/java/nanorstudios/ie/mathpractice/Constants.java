@@ -20,7 +20,7 @@ public class Constants {
     public static class OperatorKeys {
         public static String ADDITION = "addition";
         public static String DIVISION = "division";
-        public static String MULTIPLICATION = "multiplaction";
+        public static String MULTIPLICATION = "multiplication";
         public static String SUBTRACTION = "subtraction";
     }
 
