@@ -90,9 +90,17 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     }
 
     private void initArrays() {
-        mSubQuizNumbers = new int[13];
-        for (int i = 0; i < mStdQuizNumbers.length; i++) {
-            mSubQuizNumbers[i] = mStdQuizNumbers[i] + mChosenNumber;
+        switch (mOperator) {
+            case SUBTRACTION:
+                mSubQuizNumbers = new int[13];
+                for (int i = 0; i < mStdQuizNumbers.length; i++) {
+                    mSubQuizNumbers[i] = mStdQuizNumbers[i] + mChosenNumber;
+                }
+                break;
+            case DIVISION:
+                for (int i = 0; i < mDivQuizNumbers.length; i++) {
+                    mDivQuizNumbers[i] = i * mChosenNumber;
+                }
         }
     }
 
@@ -163,7 +171,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
                 }
 
                 operatorSymbol = getString(R.string.division_symbol);
-                if (randomNumber > mChosenNumber) {
+                if (randomNumber > mChosenNumber || randomNumber == 0) {
                     mCorrectAnswer = randomNumber / mChosenNumber;
                 } else if (randomNumber < mCorrectAnswer) {
                     mCorrectAnswer = mChosenNumber / randomNumber;
@@ -260,7 +268,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
             return -1;
         }
 
-        int randomNumber = new Random().nextInt(mDivQuizNumbers[mDivQuizNumbers.length - 1] - chosenNumber) * chosenNumber;
+        int randomNumber = new Random().nextInt(mDivQuizNumbers.length) * chosenNumber;
         if (mUsedNumbers.contains(randomNumber)) {
             return getRandomDivNumberFromArray(chosenNumber);
         }
