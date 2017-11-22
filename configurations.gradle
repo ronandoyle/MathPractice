@@ -1,0 +1,14 @@
+ext {
+
+}
+
+ext.getFabricKey = {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream(file('secrets.properties')))
+    def key = properties['fabricKey']
+    if (key == null) {
+        println "Can't find Fabric key."
+        return ""
+    }
+    return key
+}
