@@ -1,14 +1,15 @@
 package nanorstudios.ie.mathpractice;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.fabric.sdk.android.Fabric;
@@ -17,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
     private NumberListFragment mNumberListFragment;
     private OperatorEnum mChosenOperator;
+
+    @BindView(R.id.version) TextView mVersionTV;
     // TODO: 14/09/2017 Removing this for v1
 //    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -32,28 +35,28 @@ public class MainActivity extends AppCompatActivity {
 //        sCompletedQuizzesComponent = ((MathPracticeApplication) getApplication()).getCompletedQuizzesComponent();
         ButterKnife.bind(this);
         setupToolbar();
+        populateVersionNumber();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-//        setupDatabase();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -105,6 +108,15 @@ public class MainActivity extends AppCompatActivity {
         ft.remove(mNumberListFragment);
         ft.commit();
         mNumberListFragment = null;
+    }
+
+    private void populateVersionNumber() {
+        try {
+            mVersionTV.setText(String.format(getString(R.string.version),
+                    getPackageManager().getPackageInfo(getPackageName(), 0).versionName));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     // TODO: 14/09/2017 Removing this for v1

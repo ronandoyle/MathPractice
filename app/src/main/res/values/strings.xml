@@ -11,4 +11,5 @@
     <string name="division_symbol">\u00F7</string>
     <string name="something_broke">Oops, something broke!</string>
     <string name="question_text">%1$s %2$s %3$s = ?</string>
+    <string name="version">Version %1$s</string>
 </resources>
