@@ -1,7 +1,7 @@
 package nanorstudios.ie.mathpractice;
 
 /**
- * TODO Update this line
+ * DB references.
  */
 
 public class DatabaseReferenceClass {

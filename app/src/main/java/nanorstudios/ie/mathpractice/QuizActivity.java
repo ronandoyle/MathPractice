@@ -1,5 +1,6 @@
 package nanorstudios.ie.mathpractice;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,11 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -37,9 +38,9 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     @BindView(R.id.btn_opt1) Button mBtnOptOne;
     @BindView(R.id.btn_opt2) Button mBtnOptTwo;
     @BindView(R.id.btn_opt3) Button mBtnOptThree;
-    @BindView(R.id.btn_cheat) Button mBtnCheat;
-    @BindView(R.id.iv_feedback) ImageView mIvFeedback;
     @BindView(R.id.button_container) LinearLayout mBtnContainer;
+    @BindView(R.id.correct_ans_animation_view) LottieAnimationView mCorrectAnimationView;
+    @BindView(R.id.wrong_ans_animation_view) LottieAnimationView mWrongAnimationView;
 
     private int mChosenNumber;
     private OperatorEnum mOperator;
@@ -47,6 +48,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
 
     private int[] mStdQuizNumbers = {0,1,2,3,4,5,6,7,8,9,10,11,12};
     private int[] mSubQuizNumbers = new int[13];
+    private int[] mDivQuizNumbers = new int[13];
 
 
     private List<Integer> mUsedNumbers = new ArrayList<>(0);
@@ -54,7 +56,6 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     private Button mCorrectAnswerButton;
 
     // TODO: 14/09/2017 Removing for v1
-//    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         ButterKnife.bind(this);
         extractExtras();
         initArrays();
+        setupAnimationListener();
         setupUI();
         setupToolbar();
     }
@@ -100,26 +102,16 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
     private void setupQuestionTextView() {
         String operatorSymbol = "";
-
-//        int randomNumber = getRandomNumberFromArray();
-//
-//        if (endOfQuizReached(randomNumber)) {
-//            endQuiz();
-//            return;
-//        }
-
         int randomNumber = -1;
-
 
         switch (mOperator) {
             case ADDITION:
-
                 randomNumber = getRandomNumberFromArray();
 
                 if (endOfQuizReached(randomNumber)) {
@@ -162,15 +154,33 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
                 mCorrectAnswer = randomNumber * mChosenNumber;
                 break;
             case DIVISION:
+
+                randomNumber = getRandomDivNumberFromArray(mChosenNumber);
+
+                if (endOfQuizReached(randomNumber)) {
+                    endQuiz();
+                    return;
+                }
+
                 operatorSymbol = getString(R.string.division_symbol);
-                mCorrectAnswer = randomNumber/mChosenNumber;
+                if (randomNumber > mChosenNumber) {
+                    mCorrectAnswer = randomNumber / mChosenNumber;
+                } else if (randomNumber < mCorrectAnswer) {
+                    mCorrectAnswer = mChosenNumber / randomNumber;
+                } else {
+                    mCorrectAnswer = mChosenNumber / randomNumber;
+                }
                 break;
         }
 
         if (randomNumber < mCorrectAnswer) {
-            mTvQuestion.setText(String.valueOf(mChosenNumber) + " " + operatorSymbol + " " + String.valueOf(randomNumber) + " = ?" );
+            mTvQuestion.setText(
+                    String.format(getString(R.string.question_text), String.valueOf(mChosenNumber),
+                            operatorSymbol, String.valueOf(randomNumber)));
         } else {
-            mTvQuestion.setText(String.valueOf(randomNumber) + " " + operatorSymbol + " " + String.valueOf(mChosenNumber) + " = ?" );
+            mTvQuestion.setText(
+                    String.format(getString(R.string.question_text), String.valueOf(randomNumber),
+                            operatorSymbol, String.valueOf(mChosenNumber)));
         }
     }
 
@@ -245,28 +255,98 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         return randomNumber;
     }
 
+    private int getRandomDivNumberFromArray(int chosenNumber) {
+        if (mUsedNumbers.size() == mDivQuizNumbers.length -1) {
+            return -1;
+        }
+
+        int randomNumber = new Random().nextInt(mDivQuizNumbers[mDivQuizNumbers.length - 1] - chosenNumber) * chosenNumber;
+        if (mUsedNumbers.contains(randomNumber)) {
+            return getRandomDivNumberFromArray(chosenNumber);
+        }
+
+        mUsedNumbers.add(randomNumber);
+        return randomNumber;
+    }
+
     @OnClick({R.id.btn_opt1, R.id.btn_opt2, R.id.btn_opt3})
-    public void onClickOptOne(Button clickedBtn) {
+    public void onClickAnswer(Button clickedBtn) {
         handleBtnClick(clickedBtn);
     }
 
     private void handleBtnClick(Button button) {
         if (button == mCorrectAnswerButton) {
             showSuccessAnimation();
-            setupUI();
         } else {
             showFailureAnimation();
         }
     }
 
+    private void setupAnimationListener() {
+        setupCorrectAnimationView();
+        setupWrongAnimationView();
+    }
+
+    private void setupCorrectAnimationView() {
+        mCorrectAnimationView.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                disableAnswerButtons();
+                mCorrectAnimationView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                enableAnswerButtons();
+                mCorrectAnimationView.setVisibility(View.GONE);
+                mCorrectAnimationView.cancelAnimation();
+                setupUI();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {}
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {}
+        });
+    }
+
+    private void setupWrongAnimationView() {
+        mWrongAnimationView.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                disableAnswerButtons();
+                mWrongAnimationView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                enableAnswerButtons();
+                mWrongAnimationView.setVisibility(View.GONE);
+                mCorrectAnimationView.cancelAnimation();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {}
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {}
+        });
+
+        // Setting max progress as the wrong animation is to long and 0.5 matches the correct
+        // animation length.
+        mWrongAnimationView.setMaxProgress(0.5f);
+    }
+
     private void showSuccessAnimation() {
+        mCorrectAnimationView.playAnimation();
     }
 
     private void showFailureAnimation() {
+        mWrongAnimationView.playAnimation();
     }
 
     private void endQuiz() {
-        mBtnCheat.setVisibility(View.GONE);
         updateDatabase();
         EndOfQuizFragment fragment = EndOfQuizFragment.newInstance(mChosenNumber);
         getSupportFragmentManager()
@@ -277,15 +357,6 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     }
 
     private void updateDatabase() {
-//        if (mRootRef == null) {
-//            return;
-//        }
-        // TODO: 14/09/2017 Removing firebase from v1
-//        DatabaseReference reference = mRootRef.child("completed");
-
-//        CompletedQuizzesComponent quizzesComponent = ((MathPracticeApplication) getApplication()).getCompletedQuizzesComponent();
-
-
         SharedPreferences preferences = getSharedPreferences(Constants.Preferences.NAME, 0);
 
         String storedString = preferences.getString(Constants.Preferences.COMPLETED_QUIZZES, "");
@@ -310,7 +381,6 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
                 completedQuizzes.getQuizzes().get(Constants.OperatorKeys.DIVISION).add(String.valueOf(mChosenNumber));
                 break;
         }
-//        reference.setValue(quizzesComponent.provideCompletedQuizzes().getQuizzes());
         writeCompletedQuizzesToSharedPreferences(preferences.edit(), completedQuizzes);
     }
 
@@ -344,8 +414,15 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         finish();
     }
 
-    @OnClick(R.id.btn_cheat)
-    public void onClickCheat() {
-        endQuiz();
+    private void enableAnswerButtons() {
+        mBtnOptOne.setEnabled(true);
+        mBtnOptTwo.setEnabled(true);
+        mBtnOptThree.setEnabled(true);
+    }
+
+    private void disableAnswerButtons() {
+        mBtnOptOne.setEnabled(false);
+        mBtnOptTwo.setEnabled(false);
+        mBtnOptThree.setEnabled(false);
     }
 }

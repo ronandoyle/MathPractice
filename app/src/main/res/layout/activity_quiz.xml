@@ -62,12 +62,25 @@
             tools:text="9"/>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/iv_feedback"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        tools:src="@drawable/ic_tick"
-        android:layout_centerInParent="true"/>
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/correct_ans_animation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:lottie_fileName="check_pop.json"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"/>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/wrong_ans_animation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:lottie_fileName="x_pop.json"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"/>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -83,13 +96,6 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
-
-    <Button
-        android:id="@+id/btn_cheat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="cheat"/>
 
     <FrameLayout
         android:id="@+id/frame_container"
