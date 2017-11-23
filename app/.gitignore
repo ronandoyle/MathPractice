@@ -2,3 +2,5 @@
 /fabric.properties
 /google-services.json
 /src/main/res/values/api_keys.xml
+/signing.properties
+/docs/release.keystore

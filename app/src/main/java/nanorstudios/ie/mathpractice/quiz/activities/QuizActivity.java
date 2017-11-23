@@ -1,4 +1,4 @@
-package nanorstudios.ie.mathpractice;
+package nanorstudios.ie.mathpractice.quiz.activities;
 
 import android.animation.Animator;
 import android.content.Intent;
@@ -18,22 +18,34 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import nanorstudios.ie.mathpractice.CompletedQuizzes;
+import nanorstudios.ie.mathpractice.Constants;
+import nanorstudios.ie.mathpractice.EndOfQuizFragment;
+import nanorstudios.ie.mathpractice.NumberListFragment;
+import nanorstudios.ie.mathpractice.OperatorEnum;
+import nanorstudios.ie.mathpractice.R;
+import nanorstudios.ie.mathpractice.quiz.presenter.QuizPresenter;
+import nanorstudios.ie.mathpractice.quiz.presenter.QuizPresenterImpl;
+import nanorstudios.ie.mathpractice.quiz.viewinterfaces.QuizView;
 
 /**
  * This activity is used to quiz the user.
  */
 
-public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment.EndOfQuizCallbacks {
+public class QuizActivity extends AppCompatActivity implements
+        EndOfQuizFragment.EndOfQuizCallbacks, QuizView {
 
+    @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.tv_question) TextView mTvQuestion;
     @BindView(R.id.btn_opt1) Button mBtnOptOne;
     @BindView(R.id.btn_opt2) Button mBtnOptTwo;
@@ -55,6 +67,8 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     private List<Button> mBtnList;
     private Button mCorrectAnswerButton;
 
+    private QuizPresenter mPresenter;
+
     // TODO: 14/09/2017 Removing for v1
 
     @Override
@@ -62,6 +76,7 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
         ButterKnife.bind(this);
+        setupPresenter();
         extractExtras();
         initArrays();
         setupAnimationListener();
@@ -69,39 +84,29 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         setupToolbar();
     }
 
+    private void setupPresenter() {
+        mPresenter = new QuizPresenterImpl(this);
+    }
+
     private void extractExtras() {
         if (getIntent() == null) {
             return;
         }
-        if (getIntent().hasExtra(Constants.CHOSEN_NUMBER)) {
-            mChosenNumber = getIntent().getIntExtra(Constants.CHOSEN_NUMBER, -1);
-        }
-        if (getIntent().hasExtra(Constants.CHOSEN_OPERATOR)) {
-            mOperator = (OperatorEnum) getIntent().getSerializableExtra(Constants.CHOSEN_OPERATOR);
-        }
-        verifyChosenNumber();
+        mPresenter.extractExtras(getIntent());
     }
 
-    private void verifyChosenNumber() {
-        if (mChosenNumber == -1) {
-            Toast.makeText(this, getString(R.string.something_broke), Toast.LENGTH_SHORT).show();
-            finish();
-        }
+    @Override
+    public void displayInvalidChosenNumber() {
+        Toast.makeText(this, getString(R.string.something_broke), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void callFinish() {
+        finish();
     }
 
     private void initArrays() {
-        switch (mOperator) {
-            case SUBTRACTION:
-                mSubQuizNumbers = new int[13];
-                for (int i = 0; i < mStdQuizNumbers.length; i++) {
-                    mSubQuizNumbers[i] = mStdQuizNumbers[i] + mChosenNumber;
-                }
-                break;
-            case DIVISION:
-                for (int i = 0; i < mDivQuizNumbers.length; i++) {
-                    mDivQuizNumbers[i] = i * mChosenNumber;
-                }
-        }
+        mPresenter.initializeArrays();
     }
 
     private void setupUI() {
@@ -110,90 +115,16 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
     }
 
     private void setupQuestionTextView() {
-        String operatorSymbol = "";
-        int randomNumber = -1;
-
-        switch (mOperator) {
-            case ADDITION:
-                randomNumber = getRandomNumberFromArray();
-
-                if (endOfQuizReached(randomNumber)) {
-                    endQuiz();
-                    return;
-                }
-
-                operatorSymbol = getString(R.string.addition_symbol);
-                mCorrectAnswer = randomNumber + mChosenNumber;
-                break;
-            case SUBTRACTION:
-
-                randomNumber = getRandomSubtractionNumberFromArray(mChosenNumber);
-
-                if (endOfQuizReached(randomNumber)) {
-                    endQuiz();
-                    return;
-                }
-
-                operatorSymbol = getString(R.string.subtraction_symbol);
-                if (randomNumber > mChosenNumber) {
-                    mCorrectAnswer = randomNumber - mChosenNumber;
-                } else if (randomNumber < mCorrectAnswer) {
-                    mCorrectAnswer = mChosenNumber - randomNumber;
-                } else {
-                    mCorrectAnswer = mChosenNumber - randomNumber;
-                }
-
-                break;
-            case MULTIPLICATION:
-
-                randomNumber = getRandomNumberFromArray();
-
-                if (endOfQuizReached(randomNumber)) {
-                    endQuiz();
-                    return;
-                }
-
-                operatorSymbol = getString(R.string.multiplication_symbol);
-                mCorrectAnswer = randomNumber * mChosenNumber;
-                break;
-            case DIVISION:
-
-                randomNumber = getRandomDivNumberFromArray(mChosenNumber);
-
-                if (endOfQuizReached(randomNumber)) {
-                    endQuiz();
-                    return;
-                }
-
-                operatorSymbol = getString(R.string.division_symbol);
-                if (randomNumber > mChosenNumber || randomNumber == 0) {
-                    mCorrectAnswer = randomNumber / mChosenNumber;
-                } else if (randomNumber < mCorrectAnswer) {
-                    mCorrectAnswer = mChosenNumber / randomNumber;
-                } else {
-                    mCorrectAnswer = mChosenNumber / randomNumber;
-                }
-                break;
-        }
-
-        if (randomNumber < mCorrectAnswer) {
-            mTvQuestion.setText(
-                    String.format(getString(R.string.question_text), String.valueOf(mChosenNumber),
-                            operatorSymbol, String.valueOf(randomNumber)));
-        } else {
-            mTvQuestion.setText(
-                    String.format(getString(R.string.question_text), String.valueOf(randomNumber),
-                            operatorSymbol, String.valueOf(mChosenNumber)));
-        }
+        mPresenter.setupQuestion();
     }
 
-    private boolean endOfQuizReached(int randomNumber) {
-        return randomNumber == -1;
+    @Override
+    public void populateQuestion(@NotNull String firstNumber, @NotNull String operatorSymbol, @NotNull String secondNumber) {
+        mTvQuestion.setText(String.format(getString(R.string.question_text), firstNumber, operatorSymbol, secondNumber));
     }
 
     private void setupButtons() {
@@ -208,73 +139,34 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         mBtnList.add(mBtnOptThree);
     }
 
+    @Override
+    public void populateCorrectAnswerButton(int correctAnsButton, @NotNull String correctAnswer) {
+        mCorrectAnswerButton = mBtnList.get(correctAnsButton);
+        mCorrectAnswerButton.setText(correctAnswer);
+    }
+
+    @Override
+    public void populateWrongAnswerButton(int wrongButtonPos, String wrongAnswer) {
+        Button wrongButton = mBtnList.get(wrongButtonPos);
+        wrongButton.setText(wrongAnswer);
+    }
+
     private void setupButtonText() {
-        int correctAnswerButton = new Random().nextInt(mBtnList.size());
-
-        mCorrectAnswerButton = mBtnList.get(correctAnswerButton);
-        mCorrectAnswerButton.setText(String.valueOf(mCorrectAnswer));
-
-        List<Integer> randomWrongAnswerList = new ArrayList<>();
-        for (Button button : mBtnList) {
-            if (button != mBtnList.get(correctAnswerButton)) {
-                int randomWrongAnswer = -1;
-                randomWrongAnswer = getRandomWrongAnswer(randomWrongAnswerList, randomWrongAnswer);
-                randomWrongAnswerList.add(randomWrongAnswer);
-                button.setText(String.valueOf(randomWrongAnswer));
-            }
-        }
-    }
-
-    private int getRandomWrongAnswer(List<Integer> randomWrongAnswerList, int randomWrongAnswer) {
-        while (randomWrongAnswer == -1) {
-            randomWrongAnswer = new Random().nextInt(mStdQuizNumbers.length);
-            if (randomWrongAnswerList.contains(randomWrongAnswer) || randomWrongAnswer == mCorrectAnswer) {
-                randomWrongAnswer = -1;
-            }
-        }
-        return randomWrongAnswer;
-    }
-
-    private int getRandomNumberFromArray() {
-        if (mUsedNumbers.size() == mStdQuizNumbers.length) {
-            return -1;
-        }
-
-        int randomNumber = new Random().nextInt(mStdQuizNumbers.length);
-        if (mUsedNumbers.contains(randomNumber)) {
-            return getRandomNumberFromArray();
-        }
-
-        mUsedNumbers.add(randomNumber);
-        return randomNumber;
-    }
-
-    private int getRandomSubtractionNumberFromArray(int chosenNumber) {
-        if (mUsedNumbers.size() == mSubQuizNumbers.length -1) {
-            return -1;
-        }
-
-        int randomNumber = new Random().nextInt(mSubQuizNumbers[mSubQuizNumbers.length - 1] - chosenNumber) + chosenNumber;
-        if (mUsedNumbers.contains(randomNumber)) {
-            return getRandomSubtractionNumberFromArray(chosenNumber);
-        }
-
-        mUsedNumbers.add(randomNumber);
-        return randomNumber;
-    }
-
-    private int getRandomDivNumberFromArray(int chosenNumber) {
-        if (mUsedNumbers.size() == mDivQuizNumbers.length -1) {
-            return -1;
-        }
-
-        int randomNumber = new Random().nextInt(mDivQuizNumbers.length) * chosenNumber;
-        if (mUsedNumbers.contains(randomNumber)) {
-            return getRandomDivNumberFromArray(chosenNumber);
-        }
-
-        mUsedNumbers.add(randomNumber);
-        return randomNumber;
+        mPresenter.setupButtonText();
+//        int correctAnswerButton = new Random().nextInt(mBtnList.size());
+//
+//        mCorrectAnswerButton = mBtnList.get(correctAnswerButton);
+//        mCorrectAnswerButton.setText(String.valueOf(mCorrectAnswer));
+//
+//        List<Integer> randomWrongAnswerList = new ArrayList<>();
+//        for (Button button : mBtnList) {
+//            if (button != mBtnList.get(correctAnswerButton)) {
+//                int randomWrongAnswer = -1;
+//                randomWrongAnswer = getRandomWrongAnswer(randomWrongAnswerList, randomWrongAnswer);
+//                randomWrongAnswerList.add(randomWrongAnswer);
+//                button.setText(String.valueOf(randomWrongAnswer));
+//            }
+//        }
     }
 
     @OnClick({R.id.btn_opt1, R.id.btn_opt2, R.id.btn_opt3})
@@ -354,9 +246,10 @@ public class QuizActivity extends AppCompatActivity implements EndOfQuizFragment
         mWrongAnimationView.playAnimation();
     }
 
-    private void endQuiz() {
+    @Override
+    public void endQuiz(int chosenNumber) {
         updateDatabase();
-        EndOfQuizFragment fragment = EndOfQuizFragment.newInstance(mChosenNumber);
+        EndOfQuizFragment fragment = EndOfQuizFragment.newInstance(chosenNumber);
         getSupportFragmentManager()
                 .beginTransaction()
                 .addSharedElement(mBtnContainer, mBtnContainer.getTransitionName())

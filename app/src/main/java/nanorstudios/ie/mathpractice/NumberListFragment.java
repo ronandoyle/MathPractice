@@ -22,6 +22,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nanorstudios.ie.mathpractice.quiz.activities.QuizActivity;
 
 /**
  * A Fragment to display the list of number choices for the user.
