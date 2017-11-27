@@ -225,4 +225,12 @@ class QuizPresenterImpl(var mView: QuizView) : QuizPresenter {
         }
         return randomWrongAnswer
     }
+
+    override fun updateDatabase() {
+       mView.updateCompletedQuizzes(mChosenNumber, mChosenOperator)
+    }
+
+    override fun closingActivity() {
+        mView.closeActivity(mChosenNumber)
+    }
 }

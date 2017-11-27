@@ -13,4 +13,6 @@ interface QuizPresenter {
     fun initializeArrays()
     fun setupQuestion()
     fun setupButtonText()
+    fun updateDatabase()
+    fun closingActivity()
 }

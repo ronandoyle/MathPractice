@@ -54,22 +54,10 @@ public class QuizActivity extends AppCompatActivity implements
     @BindView(R.id.correct_ans_animation_view) LottieAnimationView mCorrectAnimationView;
     @BindView(R.id.wrong_ans_animation_view) LottieAnimationView mWrongAnimationView;
 
-    private int mChosenNumber;
-    private OperatorEnum mOperator;
-    private int mCorrectAnswer;
-
-    private int[] mStdQuizNumbers = {0,1,2,3,4,5,6,7,8,9,10,11,12};
-    private int[] mSubQuizNumbers = new int[13];
-    private int[] mDivQuizNumbers = new int[13];
-
-
-    private List<Integer> mUsedNumbers = new ArrayList<>(0);
     private List<Button> mBtnList;
     private Button mCorrectAnswerButton;
 
     private QuizPresenter mPresenter;
-
-    // TODO: 14/09/2017 Removing for v1
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,20 +141,6 @@ public class QuizActivity extends AppCompatActivity implements
 
     private void setupButtonText() {
         mPresenter.setupButtonText();
-//        int correctAnswerButton = new Random().nextInt(mBtnList.size());
-//
-//        mCorrectAnswerButton = mBtnList.get(correctAnswerButton);
-//        mCorrectAnswerButton.setText(String.valueOf(mCorrectAnswer));
-//
-//        List<Integer> randomWrongAnswerList = new ArrayList<>();
-//        for (Button button : mBtnList) {
-//            if (button != mBtnList.get(correctAnswerButton)) {
-//                int randomWrongAnswer = -1;
-//                randomWrongAnswer = getRandomWrongAnswer(randomWrongAnswerList, randomWrongAnswer);
-//                randomWrongAnswerList.add(randomWrongAnswer);
-//                button.setText(String.valueOf(randomWrongAnswer));
-//            }
-//        }
     }
 
     @OnClick({R.id.btn_opt1, R.id.btn_opt2, R.id.btn_opt3})
@@ -258,6 +232,11 @@ public class QuizActivity extends AppCompatActivity implements
     }
 
     private void updateDatabase() {
+        mPresenter.updateDatabase();
+    }
+
+    @Override
+    public void updateCompletedQuizzes(int chosenNumber, OperatorEnum operator) {
         SharedPreferences preferences = getSharedPreferences(Constants.Preferences.NAME, 0);
 
         String storedString = preferences.getString(Constants.Preferences.COMPLETED_QUIZZES, "");
@@ -265,21 +244,21 @@ public class QuizActivity extends AppCompatActivity implements
 
         if (!TextUtils.isEmpty(storedString)) {
             completedQuizzes.setQuizzes((HashMap<String, ArrayList<String>>) new Gson().
-                            fromJson(storedString, new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType()));
+                    fromJson(storedString, new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType()));
         }
 
-        switch (mOperator) {
+        switch (operator) {
             case ADDITION:
-                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.ADDITION).add(String.valueOf(mChosenNumber));
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.ADDITION).add(String.valueOf(chosenNumber));
                 break;
             case SUBTRACTION:
-                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.SUBTRACTION).add(String.valueOf(mChosenNumber));
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.SUBTRACTION).add(String.valueOf(chosenNumber));
                 break;
             case MULTIPLICATION:
-                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.MULTIPLICATION).add(String.valueOf(mChosenNumber));
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.MULTIPLICATION).add(String.valueOf(chosenNumber));
                 break;
             case DIVISION:
-                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.DIVISION).add(String.valueOf(mChosenNumber));
+                completedQuizzes.getQuizzes().get(Constants.OperatorKeys.DIVISION).add(String.valueOf(chosenNumber));
                 break;
         }
         writeCompletedQuizzesToSharedPreferences(preferences.edit(), completedQuizzes);
@@ -309,8 +288,13 @@ public class QuizActivity extends AppCompatActivity implements
 
     @Override
     public void closeActivity() {
+        mPresenter.closingActivity();
+    }
+
+    @Override
+    public void closeActivity(int chosenNumber) {
         Intent data = new Intent();
-        data.putExtra(Constants.CHOSEN_NUMBER, mChosenNumber);
+        data.putExtra(Constants.CHOSEN_NUMBER, chosenNumber);
         setResult(Constants.ResultCodes.QUIZ_FINISHED, data);
         finish();
     }
